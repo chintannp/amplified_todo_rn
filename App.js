@@ -7,12 +7,13 @@ import Home from './src/Home';
 import Header from './src/Header';
 
 Amplify.configure(awsconfig)
+
 export default function App() {
   return (
     <View style={styles.container}>
+      <StatusBar style="auto" />
       <Header />
       <Home />
-      <StatusBar style="auto" />
     </View>
   );
 }
