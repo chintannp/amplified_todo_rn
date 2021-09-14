@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, Switch } from 'react-native';
+import { StyleSheet, Text, View, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { DataStore } from 'aws-amplify';
 import { Todo } from './models';
 
 export default function Home() {
 
     const [todos, setTodos] = useState([]);
+
     let subscription;
 
     useEffect(() => {
@@ -33,34 +34,41 @@ export default function Home() {
         );
     }
 
+    const todoItem = ({ item }) => (
+        <View style={styles.todoContainer}>
+            <View>
+                <Text style={styles.todoHeading} >{item.name}</Text>
+                <Text style={styles.todoDescription} >{item.description}</Text>
+            </View>
+            <TouchableOpacity
+                style={[styles.checkbox, item.isComplete && styles.selectedCheckbox]}
+                onPress={() => {
+                    setComplete(!item.isComplete, item)
+                }}
+            >
+                <Text style={[styles.checkboxText, item.isComplete && styles.selectedCheckboxText]}> {(item.isComplete) ? "✓" : ""} </Text>
+            </TouchableOpacity>
+        </View >
+    );
+
     return (
-        <ScrollView contentContainerStyle={styles.listContainer} >
-            {todos.map((todo, i) => (
-                <View key={i} style={styles.todoContainer}>
-                    <View>
-                        <Text style={styles.todoHeading} >{`${todo.name} `}</Text>
-                        <Text style={styles.todoDescription} >{`${todo.description} `}</Text>
-                    </View>
-                    <Switch
-                        style={styles.switch}
-                        trackColor={{ false: "#767577", true: "#4696ec" }}
-                        thumbColor={"#fff"}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={(updateValue) => { setComplete(updateValue, todo) }}
-                        value={todo.isComplete}
-                    />
-                </View>
-            ))}
-        </ScrollView>
+        <SafeAreaView style={styles.container}>
+            <FlatList
+                data={todos}
+                renderItem={todoItem}
+                keyExtractor={item => item.id}
+            />
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    listContainer: {
-        padding: 10,
+    container: {
+        flex: 1,
     },
     todoContainer: {
-        margin: 10,
+        marginVertical: 5,
+        marginHorizontal: 10,
         flexDirection: "row",
         justifyContent: "space-between",
         backgroundColor: "white",
@@ -72,10 +80,6 @@ const styles = StyleSheet.create({
             width: 1
         }
     },
-    switch: {
-        alignSelf: "center",
-        margin: 10
-    },
     todoHeading: {
         fontSize: 20,
         fontWeight: "600",
@@ -83,5 +87,41 @@ const styles = StyleSheet.create({
     },
     todoDescription: {
         padding: 5,
+    },
+    checkbox: {
+        alignSelf: "center",
+        alignItems: "center",
+        borderWidth: 2,
+        height: 20,
+        width: 20,
+        margin: 10,
+        borderRadius: 2,
+    },
+    checkboxText: {
+        fontSize: 13,
+        fontWeight: "700",
+        alignSelf: 'center',
+    },
+    selectedCheckbox: {
+        backgroundColor: "black"
+    },
+    selectedCheckboxText: {
+        color: "white"
+    },
+    buttonText: {
+        fontSize: 16,
+        fontWeight: "600",
+        padding: 5,
+        alignSelf: "center",
+        color: "#fff"
+    },
+    button: {
+        backgroundColor: "#4696ec",
+        width: 150,
+        alignSelf: "center",
+        borderRadius: 25,
+        padding: 10,
+        margin: 10,
+        shadowOpacity: 0.3,
     },
 });
