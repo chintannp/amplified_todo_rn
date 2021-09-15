@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Pressable } from 'react-native';
 import { DataStore } from 'aws-amplify';
 import { Todo } from './models';
 
@@ -14,7 +14,7 @@ export default function Home() {
             const todos_list = await DataStore.query(Todo);
             setTodos(todos_list);
         };
-
+        onQuery();
         if (typeof subscription === 'undefined') {
             subscription = DataStore.observe(Todo).subscribe((msg) => {
                 onQuery();
@@ -37,28 +37,28 @@ export default function Home() {
     const todoItem = ({ item }) => (
         <View style={styles.todoContainer}>
             <View>
-                <Text style={styles.todoHeading} >{item.name}</Text>
-                <Text style={styles.todoDescription} >{item.description}</Text>
+                <Text style={styles.todoHeading}> {item.name} </Text>
+                <Text style={styles.todoDescription}> {item.description} </Text>
             </View>
-            <TouchableOpacity
+            <Pressable
                 style={[styles.checkbox, item.isComplete && styles.selectedCheckbox]}
                 onPress={() => {
                     setComplete(!item.isComplete, item)
                 }}
             >
                 <Text style={[styles.checkboxText, item.isComplete && styles.selectedCheckboxText]}> {(item.isComplete) ? "✓" : ""} </Text>
-            </TouchableOpacity>
+            </Pressable>
         </View >
     );
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <FlatList
                 data={todos}
                 renderItem={todoItem}
                 keyExtractor={item => item.id}
             />
-        </SafeAreaView>
+        </View>
     );
 }
 
@@ -107,21 +107,5 @@ const styles = StyleSheet.create({
     },
     selectedCheckboxText: {
         color: "white"
-    },
-    buttonText: {
-        fontSize: 16,
-        fontWeight: "600",
-        padding: 5,
-        alignSelf: "center",
-        color: "#fff"
-    },
-    button: {
-        backgroundColor: "#4696ec",
-        width: 150,
-        alignSelf: "center",
-        borderRadius: 25,
-        padding: 10,
-        margin: 10,
-        shadowOpacity: 0.3,
     },
 });
