@@ -37,8 +37,8 @@ export default function Home() {
     const todoItem = ({ item }) => (
         <View style={styles.todoContainer}>
             <View>
-                <Text style={styles.todoHeading}> {item.name} </Text>
-                <Text style={styles.todoDescription}> {item.description} </Text>
+                <Text style={styles.todoHeading}>{item.name}</Text>
+                <Text style={styles.todoDescription}>{item.description}</Text>
             </View>
             <Pressable
                 style={[styles.checkbox, item.isComplete && styles.selectedCheckbox]}
@@ -46,7 +46,7 @@ export default function Home() {
                     setComplete(!item.isComplete, item)
                 }}
             >
-                <Text style={[styles.checkboxText, item.isComplete && styles.selectedCheckboxText]}> {(item.isComplete) ? "✓" : ""} </Text>
+                <Text style={[styles.checkboxText, item.isComplete && styles.selectedCheckboxText]}>{(item.isComplete) ? "✓" : ""}</Text>
             </Pressable>
         </View >
     );
