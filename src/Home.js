@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, Pressable } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Pressable, Modal, TextInput } from 'react-native';
 import { DataStore } from 'aws-amplify';
 import { Todo } from './models';
 
 export default function Home() {
 
   const [todos, setTodos] = useState([]);
+  const [todoName, setTodoName] = useState("");
+  const [todoDescription, setTodoDescription] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const onQuery = async () => {
@@ -33,6 +36,17 @@ export default function Home() {
     );
   }
 
+  async function addTodo() {
+    await DataStore.save(new Todo({
+      name: todoName,
+      description: todoDescription,
+      isComplete: false
+    }));
+    setModalVisible(false);
+    setTodoName("");
+    setTodoDescription("");
+  }
+
   const todoItem = ({ item }) => (
     <View style={styles.todoContainer}>
       <View>
@@ -52,12 +66,47 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(false);
+        }}
+      >
+        <View style={styles.modalView}>
+          <Pressable style={styles.modalDismiss}
+            onPress={() => {
+              setModalVisible(false);
+            }}>
+            <Text style={styles.modalDismissText}>X</Text></Pressable>
+          <TextInput
+            style={styles.inputView}
+            placeholder="Name"
+            placeholderTextColor="black"
+            onChangeText={setTodoName}
+          />
+          <TextInput
+            style={styles.inputView}
+            placeholder="Description"
+            placeholderTextColor="black"
+            onChangeText={setTodoDescription}
+          />
+          <Pressable style={styles.button} onPress={addTodo}>
+            <Text style={styles.buttonText}>Save</Text>
+          </Pressable>
+        </View>
+      </Modal>
       <FlatList
         data={todos}
         renderItem={todoItem}
         keyExtractor={item => item.id}
       />
-      <Pressable style={styles.button}>
+      <Pressable
+        style={[styles.button, styles.floatingButton]}
+        onPress={() => {
+          setModalVisible(true);
+        }}>
         <Text style={styles.buttonText}>+ Add Todo</Text>
       </Pressable>
     </View>
@@ -111,20 +160,50 @@ const styles = StyleSheet.create({
     color: "white"
   },
   buttonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
     padding: 15,
     alignSelf: "center",
     color: "#fff"
   },
   button: {
-    position: "absolute",
-    bottom: 30,
     backgroundColor: "#4696ec",
     width: 150,
     alignSelf: "center",
     borderRadius: 25,
     shadowOpacity: 0.5,
     shadowRadius: 5,
+    marginTop: 20
   },
+  floatingButton: {
+    position: "absolute",
+    bottom: 30,
+  },
+  inputView: {
+    height: 40,
+    margin: 15,
+    borderWidth: 1,
+    padding: 10,
+  },
+  modalView: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 40,
+    alignSelf: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    width: 325,
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    marginTop: 300
+  },
+  modalDismiss: {
+    position: "absolute",
+    right: 20,
+    top: 15
+  },
+  modalDismissText: {
+    fontSize: 20,
+    fontWeight: "600"
+  }
 });
