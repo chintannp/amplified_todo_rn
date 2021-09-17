@@ -57,6 +57,9 @@ export default function Home() {
         renderItem={todoItem}
         keyExtractor={item => item.id}
       />
+      <Pressable style={styles.buttonContainer}>
+        <Text style={styles.buttonText}>+ Add Todo</Text>
+      </Pressable>
     </View>
   );
 }
@@ -106,5 +109,26 @@ const styles = StyleSheet.create({
   },
   selectedCheckboxText: {
     color: "white"
+  },
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "600",
+    padding: 15,
+    alignSelf: "center",
+    color: "#fff"
+  },
+  buttonContainer: {
+    position: "absolute",
+    bottom: 30,
+    backgroundColor: "#4696ec",
+    width: 150,
+    alignSelf: "center",
+    borderRadius: 25,
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    shadowOffset: {
+      height: 3,
+      width: 1
+    }
   },
 });
