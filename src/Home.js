@@ -124,7 +124,11 @@ const styles = StyleSheet.create({
     width: 150,
     alignSelf: "center",
     borderRadius: 25,
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    shadowOffset: {
+      height: 1,
+      width: 1
+    }
   },
 });
