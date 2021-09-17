@@ -57,7 +57,7 @@ export default function Home() {
         renderItem={todoItem}
         keyExtractor={item => item.id}
       />
-      <Pressable style={styles.button}>
+      <Pressable style={styles.buttonContainer}>
         <Text style={styles.buttonText}>+ Add Todo</Text>
       </Pressable>
     </View>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     color: "#fff"
   },
-  button: {
+  buttonContainer: {
     position: "absolute",
     bottom: 30,
     backgroundColor: "#4696ec",
