@@ -92,7 +92,7 @@ export default function Home() {
             placeholderTextColor="black"
             onChangeText={setTodoDescription}
           />
-          <Pressable style={styles.button} onPress={addTodo}>
+          <Pressable style={styles.buttonContainer} onPress={addTodo}>
             <Text style={styles.buttonText}>Save</Text>
           </Pressable>
         </View>
@@ -103,7 +103,7 @@ export default function Home() {
         keyExtractor={item => item.id}
       />
       <Pressable
-        style={[styles.button, styles.floatingButton]}
+        style={[styles.buttonContainer, styles.floatingButton]}
         onPress={() => {
           setModalVisible(true);
         }}>
@@ -123,7 +123,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "white",
-    shadowColor: "#000000",
     shadowOpacity: 0.3,
     shadowRadius: 2,
     shadowOffset: {
@@ -166,14 +165,18 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     color: "#fff"
   },
-  button: {
+  buttonContainer: {
     backgroundColor: "#4696ec",
     width: 150,
     alignSelf: "center",
     borderRadius: 25,
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    marginTop: 20
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    marginTop: 20,
+    shadowOffset: {
+      height: 1,
+      width: 1
+    }
   },
   floatingButton: {
     position: "absolute",
