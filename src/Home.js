@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, Pressable, Modal, TextInput } from 'react-native';
+import { StyleSheet, Text, View, FlatList, Pressable, Modal, TextInput, TouchableOpacity } from 'react-native';
 import { DataStore } from 'aws-amplify';
 import { Todo } from './models';
 
@@ -47,6 +47,10 @@ export default function Home() {
     setTodoDescription("");
   }
 
+  function closeModal() {
+    setModalVisible(false);
+  }
+
   const todoItem = ({ item }) => (
     <View style={styles.todoContainer}>
       <View>
@@ -64,39 +68,37 @@ export default function Home() {
     </View >
   );
 
+  const addTodoModal = (<Modal
+    animationType="fade"
+    transparent={true}
+    visible={modalVisible}
+    onRequestClose={closeModal}
+  >
+    <View style={styles.modalOverlay}>
+      <View style={styles.addTodoContainer}>
+        <Pressable style={styles.modalDismissButton}
+          onPress={closeModal}>
+          <Text style={styles.modalDismissText}>X</Text></Pressable>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          onChangeText={setTodoName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Description"
+          onChangeText={setTodoDescription}
+        />
+        <Pressable style={styles.buttonContainer} onPress={addTodo}>
+          <Text style={styles.buttonText}>Save</Text>
+        </Pressable>
+      </View>
+    </View>
+  </Modal>)
+
   return (
     <View style={styles.container}>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-      >
-        <View style={styles.modalView}>
-          <Pressable style={styles.modalDismiss}
-            onPress={() => {
-              setModalVisible(false);
-            }}>
-            <Text style={styles.modalDismissText}>X</Text></Pressable>
-          <TextInput
-            style={styles.inputView}
-            placeholder="Name"
-            placeholderTextColor="black"
-            onChangeText={setTodoName}
-          />
-          <TextInput
-            style={styles.inputView}
-            placeholder="Description"
-            placeholderTextColor="black"
-            onChangeText={setTodoDescription}
-          />
-          <Pressable style={styles.buttonContainer} onPress={addTodo}>
-            <Text style={styles.buttonText}>Save</Text>
-          </Pressable>
-        </View>
-      </Modal>
+        {addTodoModal}
       <FlatList
         data={todos}
         renderItem={todoItem}
@@ -116,6 +118,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white"
   },
   todoContainer: {
     marginVertical: 5,
@@ -170,37 +173,39 @@ const styles = StyleSheet.create({
     width: 150,
     alignSelf: "center",
     borderRadius: 25,
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    marginTop: 20,
-    shadowOffset: {
-      height: 1,
-      width: 1
-    }
   },
   floatingButton: {
     position: "absolute",
     bottom: 30,
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
+    marginTop: 20,
+    elevation:5,
+    shadowOffset: {
+      height: 3,
+      width: 1
+    }
   },
-  inputView: {
+  input: {
     height: 40,
     margin: 15,
     borderWidth: 1,
     padding: 10,
   },
-  modalView: {
+  addTodoContainer: {
     backgroundColor: "white",
     borderRadius: 20,
     padding: 40,
     alignSelf: "center",
     justifyContent: "center",
-    shadowColor: "#000",
     width: 325,
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    marginTop: 300
   },
-  modalDismiss: {
+  modalOverlay: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    flex: 1,
+    justifyContent: 'center'
+  },
+  modalDismissButton: {
     position: "absolute",
     right: 20,
     top: 15
