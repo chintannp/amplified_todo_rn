@@ -51,7 +51,7 @@ export default function Home() {
     try {
       await DataStore.delete(todo);
     } catch (e) {
-      console.log('Delete failed: $e');
+      console.log(`Delete failed: ${e}`);
     }
   }
 
