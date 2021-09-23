@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, SafeAreaView, StatusBar } from 'react-native';
 import Amplify from 'aws-amplify'
 import awsconfig from './src/aws-exports'
