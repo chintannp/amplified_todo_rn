@@ -47,12 +47,23 @@ export default function Home() {
     setTodoDescription("");
   }
 
+  async function deleteTodo(todo) {
+    try {
+      await DataStore.delete(todo);
+    } catch (e) {
+      console.log('Delete failed: $e');
+    }
+  }
+
   function closeModal() {
     setModalVisible(false);
   }
 
   const todoItem = ({ item }) => (
-    <View style={styles.todoContainer}>
+    <Pressable style={styles.todoContainer}
+      onLongPress={() => {
+        deleteTodo(item);
+      }}>
       <View>
         <Text style={styles.todoHeading}>{item.name}</Text>
         <Text style={styles.todoDescription}>{item.description}</Text>
@@ -65,7 +76,7 @@ export default function Home() {
       >
         <Text style={[styles.checkboxText, item.isComplete && styles.selectedCheckboxText]}>{(item.isComplete) ? "✓" : ""}</Text>
       </Pressable>
-    </View >
+    </Pressable >
   );
 
   const addTodoModal = (<Modal
@@ -98,7 +109,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-        {addTodoModal}
+      {addTodoModal}
       <FlatList
         data={todos}
         renderItem={todoItem}
@@ -180,7 +191,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 2,
     marginTop: 20,
-    elevation:5,
+    elevation: 5,
     shadowOffset: {
       height: 3,
       width: 1
