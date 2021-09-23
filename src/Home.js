@@ -3,38 +3,15 @@ import { StyleSheet, Text, View, FlatList, Pressable, Modal, TextInput, Touchabl
 import { DataStore } from 'aws-amplify';
 import { Todo } from './models';
 
-export default function Home() {
+const Header = () => (
+  <View style={styles.headerContainer}>
+    <Text style={styles.headerTitle}>Todo App</Text>
+  </View>
+)
 
-  const [todos, setTodos] = useState([]);
+const AddModal = ({ modalVisible, setModalVisible }) => {
   const [todoName, setTodoName] = useState("");
   const [todoDescription, setTodoDescription] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
-
-  useEffect(() => {
-    const onQuery = async () => {
-      const todos_list = await DataStore.query(Todo);
-      setTodos(todos_list);
-    };
-
-    //load todos on first render 
-    onQuery();
-
-    const subscription = DataStore.observe(Todo).subscribe((msg) => {
-      onQuery();
-    });
-
-    return function cleanup() {
-      subscription.unsubscribe();
-    }
-  }, []);
-
-  async function setComplete(updateValue, todo) {
-    await DataStore.save(
-      Todo.copyOf(todo, updated => {
-        updated.isComplete = updateValue
-      })
-    );
-  }
 
   async function addTodo() {
     await DataStore.save(new Todo({
@@ -47,39 +24,11 @@ export default function Home() {
     setTodoDescription("");
   }
 
-  async function deleteTodo(todo) {
-    try {
-      await DataStore.delete(todo);
-    } catch (e) {
-      console.log(`Delete failed: ${e}`);
-    }
-  }
-
   function closeModal() {
     setModalVisible(false);
   }
 
-  const todoItem = ({ item }) => (
-    <Pressable style={styles.todoContainer}
-      onLongPress={() => {
-        deleteTodo(item);
-      }}>
-      <View>
-        <Text style={styles.todoHeading}>{item.name}</Text>
-        <Text style={styles.todoDescription}>{item.description}</Text>
-      </View>
-      <Pressable
-        style={[styles.checkbox, item.isComplete && styles.selectedCheckbox]}
-        onPress={() => {
-          setComplete(!item.isComplete, item)
-        }}
-      >
-        <Text style={[styles.checkboxText, item.isComplete && styles.selectedCheckboxText]}>{(item.isComplete) ? "✓" : ""}</Text>
-      </Pressable>
-    </Pressable >
-  );
-
-  const addTodoModal = (<Modal
+  return (<Modal
     animationType="fade"
     transparent={true}
     visible={modalVisible}
@@ -105,16 +54,84 @@ export default function Home() {
         </Pressable>
       </View>
     </View>
-  </Modal>)
+  </Modal>);
+}
+
+const TodoList = ({ todos }) => {
+
+  async function deleteTodo(todo) {
+    try {
+      await DataStore.delete(todo);
+    } catch (e) {
+      console.log(`Delete failed: ${e}`);
+    }
+  }
+
+  async function setComplete(updateValue, todo) {
+    await DataStore.save(
+      Todo.copyOf(todo, updated => {
+        updated.isComplete = updateValue
+      })
+    );
+  }
+
+  const todoItem = ({item}) => (
+    <Pressable style={styles.todoContainer}
+      onLongPress={() => {
+        deleteTodo(item);
+      }}>
+      <View>
+        <Text style={styles.todoHeading}>{item.name}</Text>
+        <Text style={styles.todoDescription}>{item.description}</Text>
+      </View>
+      <Pressable
+        style={[styles.checkbox, item.isComplete && styles.selectedCheckbox]}
+        onPress={() => {
+          setComplete(!item.isComplete, item)
+        }}
+      >
+        <Text style={[styles.checkboxText, item.isComplete && styles.selectedCheckboxText]}>{(item.isComplete) ? "✓" : ""}</Text>
+      </Pressable>
+    </Pressable >
+  )
+
+  return (
+    < FlatList
+      data={todos}
+      renderItem={todoItem}
+      keyExtractor={item => item.id}
+    />)
+};
+
+
+export default function Home() {
+
+  const [todos, setTodos] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    const onQuery = async () => {
+      const todos_list = await DataStore.query(Todo);
+      setTodos(todos_list);
+    };
+
+    //load todos on first render 
+    onQuery();
+
+    const subscription = DataStore.observe(Todo).subscribe((msg) => {
+      onQuery();
+    });
+
+    return function cleanup() {
+      subscription.unsubscribe();
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
-      {addTodoModal}
-      <FlatList
-        data={todos}
-        renderItem={todoItem}
-        keyExtractor={item => item.id}
-      />
+      <Header />
+      <AddModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
+      <TodoList todos={todos}/>
       <Pressable
         style={[styles.buttonContainer, styles.floatingButton]}
         onPress={() => {
@@ -127,6 +144,18 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    width: "100%",
+    paddingVertical: 15,
+    backgroundColor: '#4696ec',
+  },
+  headerTitle: {
+    marginTop: 0,
+    textAlign: "center",
+    color: "white",
+    fontSize: 24,
+    fontWeight: "600"
+  },
   container: {
     flex: 1,
     backgroundColor: "white"
