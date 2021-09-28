@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -9,8 +9,8 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import {DataStore} from 'aws-amplify';
-import {Todo} from './models';
+import { DataStore } from 'aws-amplify';
+import { Todo } from './models';
 
 const Header = () => (
   <View style={styles.headerContainer}>
@@ -18,7 +18,7 @@ const Header = () => (
   </View>
 );
 
-const AddModal = ({modalVisible, setModalVisible}) => {
+const AddModal = ({ modalVisible, setModalVisible }) => {
   const [todoName, setTodoName] = useState('');
   const [todoDescription, setTodoDescription] = useState('');
 
@@ -42,7 +42,7 @@ const AddModal = ({modalVisible, setModalVisible}) => {
   return (
     <Modal
       animationType="fade"
-      transparent={true}
+      transparent
       visible={modalVisible}
       onRequestClose={closeModal}
     >
@@ -79,7 +79,7 @@ const TodoList = () => {
       setTodos(todos_list);
     };
 
-    //load todos on first render
+    // load todos on first render
     onQuery();
 
     const subscription = DataStore.observe(Todo).subscribe((msg) => {
@@ -107,7 +107,7 @@ const TodoList = () => {
     );
   }
 
-  const todoItem = ({item}) => (
+  const todoItem = ({ item }) => (
     <Pressable
       style={styles.todoContainer}
       onLongPress={() => {
