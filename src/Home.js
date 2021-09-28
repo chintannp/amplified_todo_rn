@@ -110,6 +110,9 @@ const TodoList = () => {
   const todoItem = ({ item }) => (
     <Pressable
       style={styles.todoContainer}
+      onPress={() => {
+        setComplete(!item.isComplete, item);
+      }}
       onLongPress={() => {
         deleteTodo(item);
       }}
@@ -118,12 +121,7 @@ const TodoList = () => {
         <Text style={styles.todoHeading}>{item.name}</Text>
         <Text style={styles.todoDescription}>{item.description}</Text>
       </View>
-      <Pressable
-        style={[styles.checkbox, item.isComplete && styles.selectedCheckbox]}
-        onPress={() => {
-          setComplete(!item.isComplete, item);
-        }}
-      >
+      <View style={[styles.checkbox, item.isComplete && styles.selectedCheckbox]}>
         <Text
           style={[
             styles.checkboxText,
@@ -132,7 +130,7 @@ const TodoList = () => {
         >
           {item.isComplete ? '✓' : ''}
         </Text>
-      </Pressable>
+      </View>
     </Pressable>
   );
 
