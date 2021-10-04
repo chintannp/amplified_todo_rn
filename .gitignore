@@ -13,6 +13,7 @@ web-build/
 .DS_Store
 
 amplify/team-provider-info.json
+amplify/
 
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
