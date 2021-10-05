@@ -1,38 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import {
+  FlatList,
+  Modal,
+  Pressable,
   StyleSheet,
   Text,
-  View,
-  FlatList,
-  Pressable,
-  Modal,
   TextInput,
-  TouchableOpacity,
+  View,
 } from 'react-native';
 import { DataStore } from 'aws-amplify';
 import { Todo } from './models';
 
 const Header = () => (
   <View style={styles.headerContainer}>
-    <Text style={styles.headerTitle}>Todo App</Text>
+    <Text style={styles.headerTitle}>My Todo List</Text>
   </View>
 );
 
-const AddModal = ({ modalVisible, setModalVisible }) => {
-  const [todoName, setTodoName] = useState('');
-  const [todoDescription, setTodoDescription] = useState('');
+const AddTodoModal = ({ modalVisible, setModalVisible }) => {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
 
   async function addTodo() {
-    await DataStore.save(
-      new Todo({
-        name: todoName,
-        description: todoDescription,
-        isComplete: false,
-      })
-    );
+    await DataStore.save(new Todo({ name, description, isComplete: false }));
     setModalVisible(false);
-    setTodoName('');
-    setTodoDescription('');
+    setName('');
+    setDescription('');
   }
 
   function closeModal() {
@@ -42,27 +35,27 @@ const AddModal = ({ modalVisible, setModalVisible }) => {
   return (
     <Modal
       animationType="fade"
+      onRequestClose={closeModal}
       transparent
       visible={modalVisible}
-      onRequestClose={closeModal}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.addTodoContainer}>
-          <Pressable style={styles.modalDismissButton} onPress={closeModal}>
+      <View style={styles.modalContainer}>
+        <View style={styles.modalInnerContainer}>
+          <Pressable onPress={closeModal} style={styles.modalDismissButton}>
             <Text style={styles.modalDismissText}>X</Text>
           </Pressable>
           <TextInput
-            style={styles.input}
+            onChangeText={setName}
             placeholder="Name"
-            onChangeText={setTodoName}
+            style={styles.modalInput}
           />
           <TextInput
-            style={styles.input}
+            onChangeText={setDescription}
             placeholder="Description"
-            onChangeText={setTodoDescription}
+            style={styles.modalInput}
           />
-          <Pressable style={styles.buttonContainer} onPress={addTodo}>
-            <Text style={styles.buttonText}>Save</Text>
+          <Pressable onPress={addTodo} style={styles.buttonContainer}>
+            <Text style={styles.buttonText}>Save Todo</Text>
           </Pressable>
         </View>
       </View>
@@ -107,171 +100,151 @@ const TodoList = () => {
     );
   }
 
-  const todoItem = ({ item }) => (
+  const TodoItem = ({ item }) => (
     <Pressable
-      style={styles.todoContainer}
-      onPress={() => {
-        setComplete(!item.isComplete, item);
-      }}
       onLongPress={() => {
         deleteTodo(item);
       }}
+      onPress={() => {
+        setComplete(!item.isComplete, item);
+      }}
+      style={styles.todoContainer}
     >
-      <View>
+      <Text>
         <Text style={styles.todoHeading}>{item.name}</Text>
-        <Text style={styles.todoDescription}>{item.description}</Text>
-      </View>
-      <View style={[styles.checkbox, item.isComplete && styles.selectedCheckbox]}>
-        <Text
-          style={[
-            styles.checkboxText,
-            item.isComplete && styles.selectedCheckboxText,
-          ]}
-        >
-          {item.isComplete ? '✓' : ''}
-        </Text>
-      </View>
+        {`\n${item.description}`}
+      </Text>
+      <Text
+        style={[styles.checkbox, item.isComplete && styles.completedCheckbox]}
+      >
+        {item.isComplete ? '✓' : ''}
+      </Text>
     </Pressable>
   );
 
   return (
     <FlatList
       data={todos}
-      renderItem={todoItem}
-      keyExtractor={(item) => item.id}
+      keyExtractor={({ id }) => id}
+      renderItem={TodoItem}
     />
   );
 };
 
-export default function Home() {
+const Home = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   return (
-    <View style={styles.container}>
+    <>
       <Header />
-      <AddModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
       <TodoList />
       <Pressable
-        style={[styles.buttonContainer, styles.floatingButton]}
         onPress={() => {
           setModalVisible(true);
         }}
+        style={[styles.buttonContainer, styles.floatingButton]}
       >
         <Text style={styles.buttonText}>+ Add Todo</Text>
       </Pressable>
-    </View>
+      <AddTodoModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
+    </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   headerContainer: {
-    width: '100%',
-    paddingVertical: 15,
     backgroundColor: '#4696ec',
+    paddingTop: Platform.OS === 'ios' ? 44 : null,
   },
   headerTitle: {
-    marginTop: 0,
-    textAlign: 'center',
-    color: 'white',
-    fontSize: 24,
+    color: '#fff',
+    fontSize: 20,
     fontWeight: '600',
-  },
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
+    paddingVertical: 16,
+    textAlign: 'center',
   },
   todoContainer: {
-    marginVertical: 5,
-    marginHorizontal: 10,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 2,
+    elevation: 4,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+    marginHorizontal: 8,
+    marginVertical: 4,
+    padding: 8,
     shadowOffset: {
       height: 1,
       width: 1,
     },
+    shadowOpacity: 0.3,
+    shadowRadius: 2,
   },
   todoHeading: {
     fontSize: 20,
     fontWeight: '600',
-    padding: 5,
-  },
-  todoDescription: {
-    padding: 5,
   },
   checkbox: {
-    alignSelf: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    height: 20,
-    width: 20,
-    margin: 10,
     borderRadius: 2,
-  },
-  checkboxText: {
-    fontSize: 13,
+    borderWidth: 2,
     fontWeight: '700',
-    alignSelf: 'center',
+    height: 20,
+    marginLeft: 'auto',
+    textAlign: 'center',
+    width: 20,
   },
-  selectedCheckbox: {
-    backgroundColor: 'black',
-  },
-  selectedCheckboxText: {
-    color: 'white',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    padding: 15,
-    alignSelf: 'center',
+  completedCheckbox: {
+    backgroundColor: '#000',
     color: '#fff',
   },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+    padding: 16,
+  },
   buttonContainer: {
-    backgroundColor: '#4696ec',
-    width: 150,
     alignSelf: 'center',
-    borderRadius: 25,
+    backgroundColor: '#4696ec',
+    borderRadius: 99,
+    paddingHorizontal: 8,
   },
   floatingButton: {
     position: 'absolute',
-    bottom: 30,
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    marginTop: 20,
-    elevation: 5,
+    bottom: 44,
+    elevation: 6,
     shadowOffset: {
-      height: 3,
+      height: 4,
       width: 1,
     },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
-  input: {
-    height: 40,
-    margin: 15,
-    borderWidth: 1,
-    padding: 10,
-  },
-  addTodoContainer: {
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 40,
-    alignSelf: 'center',
-    justifyContent: 'center',
-    width: 325,
-  },
-  modalOverlay: {
+  modalContainer: {
     backgroundColor: 'rgba(0,0,0,0.5)',
     flex: 1,
     justifyContent: 'center',
+    padding: 16,
+  },
+  modalInnerContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    justifyContent: 'center',
+    padding: 16,
+  },
+  modalInput: {
+    borderBottomWidth: 1,
+    marginBottom: 16,
+    padding: 8,
   },
   modalDismissButton: {
-    position: 'absolute',
-    right: 20,
-    top: 15,
+    marginLeft: 'auto',
   },
   modalDismissText: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });
+
+export default Home;
