@@ -67,17 +67,10 @@ const TodoList = () => {
   const [todos, setTodos] = useState([]);
 
   useEffect(() => {
-    const onQuery = async () => {
-      const todos_list = await DataStore.query(Todo);
-      setTodos(todos_list);
-    };
-
-    // load todos on first render
-    onQuery();
-
-    const subscription = DataStore.observe(Todo).subscribe((msg) => {
-      onQuery();
-    });
+    
+    const subscription = DataStore.observeQuery(Todo).subscribe((snapshot) => {
+    const { items, isSynced } = snapshot;
+    setTodos(items);
 
     return function cleanup() {
       subscription.unsubscribe();
