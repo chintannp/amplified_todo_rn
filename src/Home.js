@@ -71,7 +71,8 @@ const TodoList = () => {
     const subscription = DataStore.observeQuery(Todo).subscribe((snapshot) => {
     const { items, isSynced } = snapshot;
     setTodos(items);
-
+    });
+      
     return function cleanup() {
       subscription.unsubscribe();
     };
