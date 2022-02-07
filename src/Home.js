@@ -69,8 +69,8 @@ const TodoList = () => {
   useEffect(() => {
     
     const subscription = DataStore.observeQuery(Todo).subscribe((snapshot) => {
-    const { items, isSynced } = snapshot;
-    setTodos(items);
+      const { items, isSynced } = snapshot;
+      setTodos(items);
     });
       
     return function cleanup() {
