@@ -67,15 +67,17 @@ const TodoList = () => {
   const [todos, setTodos] = useState([]);
 
   useEffect(() => {
-    
+
     const subscription = DataStore.observeQuery(Todo).subscribe((snapshot) => {
       const { items, isSynced } = snapshot;
       setTodos(items);
     });
-      
+
+    //unsubscribe to data updates when component is destroyed so that we don’t introduce a memory leak.
     return function cleanup() {
       subscription.unsubscribe();
-    };
+    }
+
   }, []);
 
   async function deleteTodo(todo) {
